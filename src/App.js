@@ -1,27 +1,89 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import moment from 'moment';
+
 import './App.css';
+import Header from './components/Header.js';
+import Footer from './components/Footer.js';
+import Page from './components/Page.js';
+
+
+const API_ROUTE = 'http://api.openweathermap.org/data/2.5/group?id=6453366,2643743,625144&APPID=1ee170bc62a552b23abc2ea69acbc89a';
 
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isLoading: true,
+      locationList: [],
+      timeStamp: ""
+    };
+    //initial request
+    this.getList();
+  }
+
+  componentDidMount() {
+    //new request every minute
+    this.timer = setInterval(() => this.getList(), 60000);
+  }
+
+  async getList() {
+
+    console.log("fetching");
+    fetch(API_ROUTE).then((response) =>{
+        if(!response.ok){
+          this.setState({requestFailed: true, isLoading: false});
+          console.log(this.state);
+          throw new Error(response.status);
+        }
+        else return response;
+      })
+      .then(response => response.json())
+      .then(responseJson => this.setState({
+        locationList: responseJson,
+        timeStamp: moment()
+      }))
+      .then(() => console.log(this.state.timeStamp))
+      .then(() => this.setState({isLoading: false}))
+      .catch(error => console.log(error))
+  }
+
+  checkForRain(list) {
+    console.log("checking...");
+    let id = list.weather[0].id;
+    if(id.charAt(0) >= 2 && id.charAt(0) <=5) {
+      console.log(id);
+      return true;
+    }
+  }
+
   render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
+
+    if(this.state.isLoading){
+      return (
+        <div className="container">
+          <h1>Loading...</h1>
+        </div>
+      )
+    }
+
+    else if(this.state.requestFailed) {
+      return (
+        <div className="container">
+          <h1>Something went wrong! Try again</h1>
+        </div>
+      )
+    }
+    else {
+      return (
+        <div className="container">
+          <Header timeStamp={this.state.timeStamp}/>
+          <Page locationList={this.state.locationList} checkForRain={this.checkForRain}/>
+          <Footer timeStamp={this.state.timeStamp}/>
+        </div>
+      );
+    }
   }
 }
 
