@@ -30,32 +30,20 @@ class App extends Component {
 
   async getList() {
 
-    console.log("fetching");
     fetch(API_ROUTE).then((response) =>{
         if(!response.ok){
           this.setState({requestFailed: true, isLoading: false});
           console.log(this.state);
           throw new Error(response.status);
         }
-        else return response;
+        else return response.json();
       })
-      .then(response => response.json())
       .then(responseJson => this.setState({
         locationList: responseJson,
         timeStamp: moment()
       }))
-      .then(() => console.log(this.state.timeStamp))
       .then(() => this.setState({isLoading: false}))
       .catch(error => console.log(error))
-  }
-
-  checkForRain(list) {
-    console.log("checking...");
-    let id = list.weather[0].id;
-    if(id.charAt(0) >= 2 && id.charAt(0) <=5) {
-      console.log(id);
-      return true;
-    }
   }
 
   render() {

@@ -3,6 +3,7 @@ import 'babel-polyfill';
 import "isomorphic-fetch"
 //IE11 support END
 
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 
