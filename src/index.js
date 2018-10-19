@@ -1,5 +1,11 @@
+//IE11 support
+import 'babel-polyfill';
+import "isomorphic-fetch"
+//IE11 support END
+
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
